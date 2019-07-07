@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from reminders.gateways import EntityGateway, NotificationGateway, TimeSource
-from reminders.types import timestamp
+from .gateways import EntityGateway, NotificationGateway, TimeSource
+from .types import timestamp
 
 
 @dataclass

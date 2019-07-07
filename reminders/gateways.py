@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Collection
 
-from reminders.entities import Reminder
-from reminders.types import timestamp
+from .entities import Reminder
+from .types import timestamp
 
 
 class TimeSource(ABC):

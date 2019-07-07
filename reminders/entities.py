@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from reminders.types import timestamp
+from .types import timestamp
 
 
 @dataclass
