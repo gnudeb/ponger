@@ -2,8 +2,10 @@ import unittest
 from dataclasses import dataclass, field
 from typing import List
 
-from reminders import CreateReminderUseCase, SendDueRemindersUseCase, \
-    TimeSource, timestamp, EntityGateway, Reminder, NotificationGateway
+from reminders.entities import Reminder
+from reminders.gateways import EntityGateway, NotificationGateway, TimeSource
+from reminders.types import timestamp
+from reminders.usecases import CreateReminderUseCase, SendDueRemindersUseCase
 
 
 @dataclass
