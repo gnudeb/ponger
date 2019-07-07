@@ -70,5 +70,3 @@ class SendDueRemindersUseCase:
             self.notification_gateway.send_notification(
                 message=reminder.message
             )
-
-
