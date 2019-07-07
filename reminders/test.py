@@ -109,8 +109,8 @@ class TestReminders(unittest.TestCase):
 
         self._when_time_is_advanced_by(seconds=45)
 
-        self.assertIn("Hi", self.notification_gateway)
-        self.assertNotIn("Hello", self.notification_gateway)
+        self._then_particular_notification_have_been_sent(message="Hi")
+        self._then_particular_notification_have_not_been_sent(message="Hello")
 
     def test_reminder_is_sent_only_once(self):
         self._given_reminder(interval=30)
@@ -139,6 +139,12 @@ class TestReminders(unittest.TestCase):
             self.assertTrue(self.notification_gateway.has_notifications())
         else:
             self.assertEqual(len(self.notification_gateway), amount)
+
+    def _then_particular_notification_have_been_sent(self, message: str):
+        self.assertIn(message, self.notification_gateway)
+
+    def _then_particular_notification_have_not_been_sent(self, message: str):
+        self.assertNotIn(message, self.notification_gateway)
 
 
 if __name__ == '__main__':
