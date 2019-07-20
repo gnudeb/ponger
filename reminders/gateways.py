@@ -18,7 +18,8 @@ class EntityGateway(ABC):
     time_source: TimeSource = None
 
     @abstractmethod
-    def create_reminder(self, message: str, due_to: timestamp):
+    def create_reminder(
+            self, message: str, due_to: timestamp, recipient_id: int):
         pass
 
     @abstractmethod
@@ -28,5 +29,5 @@ class EntityGateway(ABC):
 
 class NotificationGateway(ABC):
 
-    def send_notification(self, message: str):
+    def send_notification(self, message: str, recipient_id: int):
         pass

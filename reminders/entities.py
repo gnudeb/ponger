@@ -7,4 +7,9 @@ from .types import timestamp
 class Reminder:
     message: str
     due_to: timestamp
+    recipient_id: int
     sent: bool = False
+
+    def mark_sent(self) -> 'Reminder':
+        self.sent = True
+        return self

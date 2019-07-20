@@ -1,8 +1,9 @@
 import unittest
 
 from reminders.usecases import CreateReminderUseCase, SendDueRemindersUseCase
-from .mocks import InMemoryEntityGateway, StubNotificationGateway, \
+from .mocks import StubNotificationGateway, \
     ArtificialTimeSource
+from bot import InMemoryEntityGateway
 
 
 class TestReminders(unittest.TestCase):
@@ -63,8 +64,24 @@ class TestReminders(unittest.TestCase):
 
         self._then_no_notification_have_been_sent()
 
+    def test_reminders_can_be_sent_out_of_order(self):
+        self._given_reminder(message="A", interval=60)
+        self._given_reminder(message="B", interval=30)
+
+        self._when_time_is_advanced_by(seconds=45)
+
+        self._then_particular_notification_have_been_sent(message="B")
+
+        self._when_time_is_advanced_by(seconds=45)
+
+        self._then_particular_notification_have_been_sent(message="A")
+
     def _given_reminder(self, message: str = "", interval: int = 60):
-        self.create.create_with_interval(message=message, interval=interval)
+        self.create.create_with_interval(
+            message=message,
+            interval=interval,
+            recipient_id=1,
+        )
 
     def _when_time_is_advanced_by(self, seconds: int):
         self.notification_gateway.forget_sent_notifications()
