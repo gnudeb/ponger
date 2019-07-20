@@ -52,12 +52,6 @@ class InMemoryEntityGateway(EntityGateway):
         unsent_reminders = filter(lambda r: not r.sent, expired_reminders)
         return list(map(Reminder.mark_sent, unsent_reminders))
 
-    def are_expired_reminders_present(self) -> bool:
-        for reminder in self._reminders:
-            if self._is_reminder_expired(reminder):
-                return True
-        return False
-
     def _is_reminder_expired(self, reminder: Reminder) -> bool:
         return self.time_source.now() >= reminder.due_to
 
