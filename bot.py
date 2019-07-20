@@ -68,8 +68,6 @@ class Ponger:
         message: str = update.message.text
         logger.debug(f"Ponger got message '{message}'!")
 
-        interval, message = self._extract_interval_from_message(message)
-
         self.create.create_with_interval(
             message=message,
             interval=self._extract_interval_from_message(message),
@@ -79,13 +77,11 @@ class Ponger:
         self._update_interval()
 
     @staticmethod
-    def _extract_interval_from_message(message) -> Tuple[int, str]:
+    def _extract_interval_from_message(message) -> int:
         try:
-            raw_interval, message = message.split(" ", maxsplit=1)
-            interval = int(raw_interval)
+            return int(message.split(" ")[0])
         except ValueError:
-            interval = 1
-        return interval, message
+            return 1
 
     def start(self):
         self._ping_sender(threaded=True)
