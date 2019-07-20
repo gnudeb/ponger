@@ -13,7 +13,7 @@ from telegram import Update, Bot
 from telegram.ext.filters import Filters
 
 from reminders.entities import Reminder
-from reminders.gateways import TimeSource, NotificationGateway, EntityGateway
+from reminders.gateways import TimeSource, NotificationGateway, ReminderGateway
 from reminders.types import timestamp
 from reminders.usecases import CreateReminderUseCase, SendDueRemindersUseCase
 
@@ -40,7 +40,7 @@ class TelegramNotificationGateway(NotificationGateway):
 
 
 @dataclass
-class InMemoryEntityGateway(EntityGateway):
+class InMemoryReminderGateway(ReminderGateway):
     _reminders: List[Reminder] = field(default_factory=list)
 
     def create_reminder(
@@ -146,18 +146,18 @@ if __name__ == '__main__':
     time_source: TimeSource = PythonTimeSource()
     notification_gateway: NotificationGateway = \
         TelegramNotificationGateway(telegram_bot=updater.bot)
-    entity_gateway: EntityGateway = InMemoryEntityGateway(
+    reminder_gateway: ReminderGateway = InMemoryReminderGateway(
         time_source=time_source
     )
 
     ponger = Ponger(
         bot=updater.bot,
         create=CreateReminderUseCase(
-            entity_gateway=entity_gateway,
+            reminder_gateway=reminder_gateway,
             time_source=time_source,
         ),
         send=SendDueRemindersUseCase(
-            entity_gateway=entity_gateway,
+            reminder_gateway=reminder_gateway,
             notification_gateway=notification_gateway,
         ),
     )

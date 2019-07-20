@@ -2,7 +2,7 @@ import unittest
 
 from reminders.usecases import CreateReminderUseCase, SendDueRemindersUseCase
 from .mocks import StubNotificationGateway, \
-    ArtificialTimeSource, ExposedEntityGateway
+    ArtificialTimeSource, ExposedReminderGateway
 
 
 class TestReminders(unittest.TestCase):
@@ -10,15 +10,15 @@ class TestReminders(unittest.TestCase):
     def setUp(self):
         self.time_source = ArtificialTimeSource()
         self.notification_gateway = StubNotificationGateway()
-        entity_gateway = ExposedEntityGateway(
+        reminder_gateway = ExposedReminderGateway(
             time_source=self.time_source
         )
         self.create = CreateReminderUseCase(
-            entity_gateway=entity_gateway,
+            reminder_gateway=reminder_gateway,
             time_source=self.time_source
         )
         self.send = SendDueRemindersUseCase(
-            entity_gateway=entity_gateway,
+            reminder_gateway=reminder_gateway,
             notification_gateway=self.notification_gateway
         )
 

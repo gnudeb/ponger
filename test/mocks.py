@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from bot import InMemoryEntityGateway
+from bot import InMemoryReminderGateway
 from reminders.gateways import NotificationGateway, TimeSource
 from reminders.types import timestamp
 
 
-class ExposedEntityGateway(InMemoryEntityGateway):
+class ExposedReminderGateway(InMemoryReminderGateway):
     def are_expired_reminders_present(self) -> bool:
         for reminder in self._reminders:
             if self._is_reminder_expired(reminder):

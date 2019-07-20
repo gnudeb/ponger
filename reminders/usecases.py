@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 
-from .gateways import EntityGateway, NotificationGateway, TimeSource
+from .gateways import ReminderGateway, NotificationGateway, TimeSource
 from .types import timestamp
 
 
 @dataclass
 class CreateReminderUseCase:
-    entity_gateway: EntityGateway
+    reminder_gateway: ReminderGateway
     time_source: TimeSource
 
     def create_with_due_date(
             self, message: str, due_to: timestamp, recipient_id: int):
 
-        self.entity_gateway.create_reminder(
+        self.reminder_gateway.create_reminder(
             message=message, due_to=due_to, recipient_id=recipient_id
         )
 
@@ -29,12 +29,12 @@ class CreateReminderUseCase:
 
 @dataclass
 class SendDueRemindersUseCase:
-    entity_gateway: EntityGateway
+    reminder_gateway: ReminderGateway
     notification_gateway: NotificationGateway
 
     def execute(self) -> bool:
         sent_anything = False
-        for reminder in self.entity_gateway.get_due_reminders_and_mark_sent():
+        for reminder in self.reminder_gateway.get_due_reminders_and_mark_sent():
             self.notification_gateway.send_notification(
                 message=reminder.message,
                 recipient_id=reminder.recipient_id

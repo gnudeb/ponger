@@ -14,7 +14,7 @@ class TimeSource(ABC):
 
 
 @dataclass
-class EntityGateway(ABC):
+class ReminderGateway(ABC):
     time_source: TimeSource = None
 
     @abstractmethod
