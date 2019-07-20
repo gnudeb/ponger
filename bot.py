@@ -17,13 +17,6 @@ from reminders.gateways import TimeSource, NotificationGateway, ReminderGateway
 from reminders.types import timestamp
 from reminders.usecases import CreateReminderUseCase, SendDueRemindersUseCase
 
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-    level=logging.DEBUG,
-)
-
-logger = logging.getLogger(__name__)
-
 
 class PythonTimeSource(TimeSource):
 
@@ -61,12 +54,13 @@ class Ponger:
     bot: Bot
     create: CreateReminderUseCase
     send: SendDueRemindersUseCase
+    logger: logging.Logger
     _send_interval: int = field(default=1, init=False)
     _running: bool = field(default=False, init=False)
 
     def handle_message(self, update: Update, context: CallbackContext):
         message: str = update.message.text
-        logger.debug(f"Ponger got message '{message}'!")
+        self.logger.debug(f"Ponger got message '{message}'!")
 
         self.create.create_with_interval(
             message=message,
@@ -87,7 +81,7 @@ class Ponger:
         self._ping_sender(threaded=True)
 
     def stop(self):
-        logger.debug("Initiating ponger shutdown...")
+        self.logger.debug("Initiating ponger shutdown...")
         self._running = False
 
     def _ping_sender(self, threaded=False):
@@ -96,15 +90,17 @@ class Ponger:
             return
         self._running = True
         while self._running:
-            logger.debug(f"Initiating notification sending...")
+            self.logger.debug(f"Initiating notification sending...")
+
             sent_anything: bool = self.send.execute()
             self._update_interval(sent_anything)
-            logger.debug(
+
+            self.logger.debug(
                 f"Ponger sleeping for {self._send_interval} seconds..."
             )
             sleep(self._send_interval)
 
-        logger.debug("Ponger thread has ended")
+        self.logger.debug("Ponger thread has ended")
 
     def _update_interval(self, sent_anything: bool = True):
         if sent_anything:
@@ -120,13 +116,17 @@ class PongerConfiguration(ABC):
         pass
 
 
+@dataclass
 class CommandLinePongerConfiguration(PongerConfiguration):
-    def __init__(self):
+    logger: logging.Logger
+    _bot_token: str = field(init=False)
+
+    def __post_init__(self):
         try:
             _, self._bot_token = argv
         except ValueError:
             # TODO: maybe more graceful error handling?
-            logger.error("Expected one argument: bot token")
+            self.logger.error("Expected one argument: bot token")
             sys.exit(-1)
 
     @property
@@ -136,7 +136,16 @@ class CommandLinePongerConfiguration(PongerConfiguration):
 
 if __name__ == '__main__':
 
-    configuration: PongerConfiguration = CommandLinePongerConfiguration()
+    logging.basicConfig(
+        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+        level=logging.DEBUG,
+    )
+
+    logger = logging.getLogger(__name__)
+
+    configuration: PongerConfiguration = CommandLinePongerConfiguration(
+        logger=logger.getChild("configuration")
+    )
 
     updater = Updater(
         token=configuration.bot_token,
@@ -160,6 +169,7 @@ if __name__ == '__main__':
             reminder_gateway=reminder_gateway,
             notification_gateway=notification_gateway,
         ),
+        logger=logger.getChild("ponger")
     )
 
     updater.dispatcher.add_handler(MessageHandler(
