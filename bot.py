@@ -61,7 +61,7 @@ class Ponger:
     bot: Bot
     create: CreateReminderUseCase
     send: SendDueRemindersUseCase
-    send_interval: int = field(default=1, init=False)
+    _send_interval: int = field(default=1, init=False)
     _running: bool = field(default=False, init=False)
 
     def handle_message(self, update: Update, context: CallbackContext):
@@ -100,17 +100,17 @@ class Ponger:
             sent_anything: bool = self.send.execute()
             self._update_interval(sent_anything)
             logger.debug(
-                f"Ponger sleeping for {self.send_interval} seconds..."
+                f"Ponger sleeping for {self._send_interval} seconds..."
             )
-            sleep(self.send_interval)
+            sleep(self._send_interval)
 
         logger.debug("Ponger thread has ended")
 
     def _update_interval(self, sent_anything: bool = True):
         if sent_anything:
-            self.send_interval = 1
+            self._send_interval = 1
         else:
-            self.send_interval = min(3, self.send_interval + 1)
+            self._send_interval = min(3, self._send_interval + 1)
 
 
 class PongerConfiguration(ABC):
